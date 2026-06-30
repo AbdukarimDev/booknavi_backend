@@ -5,11 +5,26 @@ const connectDB = require('./config/db');
 const bookRoutes = require('./routes/bookRoutes');
 const authRoutes = require('./routes/authRoutes');
 const orderRoutes = require('./routes/orderRoutes');
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 connectDB();
 
 
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin: 'https://book-navi-frontend.vercel.app',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true
+}));
+const limiter = rateLimit({
+    windowMs: 15*60*1000,
+    max: 100,
+    message: 'Juda ko\'p so\'rov yuborildi, keyinroq urinib ko\'ring'
+
+});
+
+app.use(helmet());
+app.use(limiter);
 app.use(express.json());
 app.use('/api', bookRoutes);
 app.use('/api/auth', authRoutes);
