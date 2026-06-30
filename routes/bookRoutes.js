@@ -9,7 +9,7 @@ router.get('/books/:id', getBookById);
 router.put('/books/:id',protect, isAdmin, updateBook);
 router.post('/books/upload', protect, isAdmin, upload.single('image'), (req, res) => {
     console.log(req.file)
-    res.json({ url: `http://localhost:5000/uploads/${req.file.filename}` });
+    res.json({ url: req.file.path});
 });
 router.delete('/books/:id',protect, isAdmin, deleteBook)
 module.exports = router;
