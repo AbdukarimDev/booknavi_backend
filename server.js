@@ -12,9 +12,9 @@ connectDB();
 
 const app = express();
 app.use(cors({
-    origin: ['https://book-navi-frontend.vercel.app',
+    origin: [
     'http://localhost:5173',
-        'http://localhost:5174'],
+        ],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true
 }));
