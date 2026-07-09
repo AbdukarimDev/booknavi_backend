@@ -42,7 +42,13 @@ const bookSchema = new mongoose.Schema({
     isFeatured: {
         type: Boolean,
         default: false
+    },
+    ratings: [
+    {
+        user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        value: { type: Number, min: 1, max: 5 }
     }
+],
 
 });
 

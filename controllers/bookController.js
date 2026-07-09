@@ -42,6 +42,33 @@ const updateBook = async (req,res) => {
     }
 }
 
+const rateBook = async (req, res) => {
+    try {
+        const { value } = req.body;
+        const book = await Book.findById(req.params.id);
+        if (!book) {
+            return res.status(404).json({ message: 'Kitob topilmadi' });
+        }
+
+        // Bu foydalanuvchi oldin baholaganmi?
+        const existing = book.ratings.find(r => r.user.toString() === req.user.id);
+        if (existing) {
+            existing.value = value;  // eski bahoni yangilaydi
+        } else {
+            book.ratings.push({ user: req.user.id, value });
+        }
+
+        // O'rtacha reytingni hisoblash
+        const sum = book.ratings.reduce((acc, r) => acc + r.value, 0);
+        book.rating = (sum / book.ratings.length).toFixed(1);
+
+        await book.save();
+        res.status(200).json({ rating: book.rating });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
 const deleteBook = async (req,res) => {
     try {
         const id = req.params.id;
@@ -55,4 +82,4 @@ const deleteBook = async (req,res) => {
 
     }
 }
-module.exports = { getAllBooks, createBook, getBookById, updateBook, deleteBook };
+module.exports = { getAllBooks, createBook, getBookById, updateBook, deleteBook, rateBook };

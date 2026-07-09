@@ -9,16 +9,23 @@ const jwt = require('jsonwebtoken');
 
  const register = async(req,res) => {
     try {
-        const { name, email, password, role } = req.body;
+        const { name, phone, password } = req.body;
         
-        //1.Email tekshirish
-        const existingUser = await User.findOne({ email });
+     if (!/^01[0-9]{8,9}$/.test(phone)) {
+    return res.status(400).json({ message: "Telefon raqam noto'g'ri formatda" });
+}
 
-        if (existingUser) {
-            return res.status(400).json({
-                message: "Bu email allaqachon ro'yhatdan o'tgan"
-            });
-        }
+// Parol uzunligini tekshirish
+if (!password || password.length < 6) {
+    return res.status(400).json({ message: "Parol kamida 6 belgi bo'lishi kerak" });
+}
+
+const existingUser = await User.findOne({ phone });
+if (existingUser) {
+    return res.status(400).json({
+        message: "Bu raqam allaqachon ro'yxatdan o'tgan"
+    });
+}
 
         //2.Parolni shifrlash
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -26,9 +33,8 @@ const jwt = require('jsonwebtoken');
         //3. User yaratish
         const user = await User.create({
             name, 
-            email,
+            phone,
             password: hashedPassword,
-            role
         });
 
         //4. Token yaratish
@@ -39,7 +45,7 @@ const jwt = require('jsonwebtoken');
             user: {
                 id: user._id,
                 name: user.name,
-                email: user.email
+                phone: user.phone
             }
         });
     } catch (error) {
@@ -51,9 +57,9 @@ const jwt = require('jsonwebtoken');
 
 const login = async(req,res) => {
     try { 
-        const { email, password } = req.body;
+        const { phone, password } = req.body;
 
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ phone });
         if (!user) {
             return res.status(404).json({message:'Foydalanuvchi topilmadi '});
         }
@@ -64,7 +70,7 @@ const login = async(req,res) => {
         }
 
         const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d'});
-        res.status(200).json({ token, user: { id: user._id, name: user.name, email: user.email } });
+        res.status(200).json({ token, user: { id: user._id, name: user.name, phone: user.phone } });
 
 
 
