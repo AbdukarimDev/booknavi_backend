@@ -14,9 +14,11 @@ const app = express();
 app.use(cors({
     origin: [
     'https://book-navi-frontend.vercel.app',
-        'http://localhost:5173',
-        'http://localhost:5174'
-        ],
+    'https://booknavi.kr',
+    'https://www.booknavi.kr',
+    'http://localhost:5173',
+    'http://localhost:5174'
+],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true
 }));
